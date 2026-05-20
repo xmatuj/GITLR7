@@ -1,12 +1,11 @@
 import { useEffect } from 'react';
 import { load } from '@2gis/mapgl';
 import { useMapglContext } from './MapglContext';
-import { Clusterer } from '@2gis/mapgl-clusterer';
-import { RulerControl } from '@2gis/mapgl-ruler';
-import { Directions } from '@2gis/mapgl-directions';
 import { useControlRotateClockwise } from './useControlRotateClockwise';
 import { ControlRotateCounterclockwise } from './ControlRotateConterclockwise';
 import { MapWrapper } from './MapWrapper';
+import { FeatureCollection, Geometry, GeoJsonProperties } from 'geojson';
+import geoData from './data/tverskaia-oblast.json';
 
 export const MAP_CENTER = [35.917421, 56.858745];
 
@@ -15,66 +14,69 @@ export default function Mapgl() {
 
     useEffect(() => {
         let map: mapgl.Map | undefined = undefined;
-        let directions: Directions | undefined = undefined;
-        let clusterer: Clusterer | undefined = undefined;
 
         load().then((mapgl) => {
             map = new mapgl.Map('map-container', {
                 center: MAP_CENTER,
-                zoom: 13,
+                zoom: 12,
                 key: 'a3dde53f-81d3-4f90-ba73-12824734c793',
                 style: '83a6b2e5-e269-4607-ba06-255accc03f44',
             });
 
-            map.on('click', (e) => console.log(e));
+            const data: FeatureCollection<Geometry, GeoJsonProperties> = 
+                geoData as FeatureCollection<Geometry, GeoJsonProperties>;
 
-            /**
-             * Ruler  plugin
-             */
-
-            const rulerControl = new RulerControl(map, { position: 'centerRight' });
-
-            /**
-             * Clusterer plugin
-             */
-
-            clusterer = new Clusterer(map, {
-                radius: 60,
+            const source = new mapgl.GeoJsonSource(map, {
+                data,
+                attributes: {
+                    visible: true,
+                },
             });
 
-            const markers = [
-                { coordinates: [55.27887, 25.21001] },
-                { coordinates: [55.30771, 25.20314] },
-                { coordinates: [55.35266, 25.24382] },
-            ];
-            clusterer.load(markers);
-
-            /**
-             * Directions plugin
-             */
-
-            directions = new Directions(map, {
-                directionsApiKey: 'rujany4131', // It's just demo key
-            });
-
-            directions.carRoute({
-                points: [
-                    [55.28273111108218, 25.234131928828333],
-                    [55.35242563034581, 25.23925607042088],
+            const layer = {
+                id: 'dtp-data-layer',
+                filter: [
+                    'all',
+                    [
+                        'match',
+                        ['sourceAttr', 'visible'],
+                        [true],
+                        true,
+                        false,
+                    ],
                 ],
+                type: 'point',
+                style: {
+                    iconImage: 'crash',
+                    iconWidth: 16,
+                    iconHeight: 16,
+                    textField: [
+                        'concat',
+                        ['get', 'category'],
+                        '|',
+                        ['get', 'severity']
+                    ],
+                    textFont: ['Noto_Sans'],
+                    textSize: 8,
+                    textColor: '#ff6600',
+                    textHaloColor: '#ffffff',
+                    textHaloWidth: 2,
+                    iconPriority: 100,
+                    textPriority: 100,
+                },
+            };
+
+            map.on('styleload', () => {
+                map?.addLayer(layer);
             });
 
             setMapglContext({
                 mapglInstance: map,
-                rulerControl,
                 mapgl,
             });
         });
 
-        // Destroy the map, if Map component is going to be unmounted
         return () => {
-            directions && directions.clear();
-            clusterer && clusterer.destroy();
             map && map.destroy();
             setMapglContext({ mapglInstance: undefined, mapgl: undefined });
         };
