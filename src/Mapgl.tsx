@@ -66,6 +66,40 @@ export default function Mapgl() {
                 },
             };
 
+            const layer2 = {
+                id: 'dtp-heatmap-layer', 
+                filter: [
+                    'match',
+                    ['sourceAttr', 'visible'],
+                    [true],
+                    true,
+                    false,
+                ],
+                type: 'heatmap',
+                style: {
+                    color: [
+                        'interpolate',
+                        ['linear'],
+                        ['heatmap-density'],
+                        0, 'rgba(133, 92, 117, 0)',
+                        0.2, 'rgba(133, 92, 117, 0.6)',
+                        0.35, 'rgba(175, 111, 69, 0.7)',
+                        0.5, 'rgba(217, 175, 107, 0.8)',
+                        0.65, 'rgba(115, 111, 76, 0.9)',
+                        0.8, 'rgba(104, 133, 92, 0.95)',
+                        1, 'rgba(175, 100, 88, 1)', 
+                    ],
+                    radius: 20,
+                    intensity: 0.8,
+                    opacity: 0.8,
+                    downscale: 1,
+                },
+            };
+            map.on('styleload', () => {
+                map?.addLayer(layer2);
+            });
+
+
             map.on('styleload', () => {
                 map?.addLayer(layer);
             });
