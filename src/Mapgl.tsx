@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { load } from '@2gis/mapgl';
 import { useMapglContext } from './MapglContext';
 import { useControlRotateClockwise } from './useControlRotateClockwise';
@@ -18,11 +18,13 @@ export default function Mapgl() {
         load().then((mapgl) => {
             map = new mapgl.Map('map-container', {
                 center: MAP_CENTER,
-                zoom: 12,
-                key: 'a3dde53f-81d3-4f90-ba73-12824734c793',
-                //style: '83a6b2e5-e269-4607-ba06-255accc03f44',
+                zoom: 18,
+                rotation: 14.24,
                 maxPitch: 70,
+                key: 'a3dde53f-81d3-4f90-ba73-12824734c793',
+                style: '83a6b2e5-e269-4607-ba06-255accc03f44',
                 styleState: { globeEnabled: true },
+                graphicsPreset: 'immersive',
             });
 
             const data: FeatureCollection<Geometry, GeoJsonProperties> = 
@@ -31,6 +33,7 @@ export default function Mapgl() {
             const source = new mapgl.GeoJsonSource(map, {
                 data,
                 attributes: { visible: true },
+                
             });
 
             const layer = {
@@ -103,27 +106,37 @@ export default function Mapgl() {
                 map?.addLayer(layer2);
             });
 
-            map.on('styleload', () => {
-                map?.addLayer(layer);
+            const toggleImmersiveRoads = (enabled: boolean) => {
+                map?.patchStyleState({ immersiveRoadsOn: enabled });
+            };
 
-                if (!map) return;
-
-                map.patchStyleState({ realisticSkyEnabled: true });
-
-                map.patchStyleState({ lightingMode: 'sun' });
-                map.setLighting({
-                    direction: [0, -1, 0.5],
-                    intensity: 0.2,
-                    color: '#f8f403'
+            const toggleSkyAndFog = (enabled: boolean) => {
+                map?.patchStyleState({ 
+                    realisticSkyEnabled: enabled,
+                    fogEnabled: enabled 
                 });
+            };
 
-                map.setTrafficLayer({
-                    enabled: true,
+            const setLighting = () => {
+                map?.patchStyleState({ lightingMode: 'sun' });
+            };
+
+            const toggleTraffic = (enabled: boolean) => {
+                map?.setTrafficLayer({
+                    enabled: enabled,
                     style: 'default',
                 });
+                console.log(`Пробки: ${enabled ? 'Включены' : 'Выключены'}`);
+            };
 
-                map.patchStyleState({ immersiveRoadsOn: true });
+
+            map.once('styleload', () => {
+                map?.addLayer(layer);
                 
+                toggleImmersiveRoads(true);
+                toggleSkyAndFog(true);
+                setLighting();
+                toggleTraffic(true);
             });
 
             setMapglContext({
