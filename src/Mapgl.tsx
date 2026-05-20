@@ -20,7 +20,9 @@ export default function Mapgl() {
                 center: MAP_CENTER,
                 zoom: 12,
                 key: 'a3dde53f-81d3-4f90-ba73-12824734c793',
-                style: '83a6b2e5-e269-4607-ba06-255accc03f44',
+                //style: '83a6b2e5-e269-4607-ba06-255accc03f44',
+                maxPitch: 70,
+                styleState: { globeEnabled: true },
             });
 
             const data: FeatureCollection<Geometry, GeoJsonProperties> = 
@@ -28,9 +30,7 @@ export default function Mapgl() {
 
             const source = new mapgl.GeoJsonSource(map, {
                 data,
-                attributes: {
-                    visible: true,
-                },
+                attributes: { visible: true },
             });
 
             const layer = {
@@ -46,6 +46,8 @@ export default function Mapgl() {
                     ],
                 ],
                 type: 'point',
+                minzoom: 10,
+                maxzoom: 20,
                 style: {
                     iconImage: 'crash',
                     iconWidth: 16,
@@ -76,6 +78,8 @@ export default function Mapgl() {
                     false,
                 ],
                 type: 'heatmap',
+                minzoom: 10,
+                maxzoom: 20,
                 style: {
                     color: [
                         'interpolate',
@@ -99,9 +103,27 @@ export default function Mapgl() {
                 map?.addLayer(layer2);
             });
 
-
             map.on('styleload', () => {
                 map?.addLayer(layer);
+
+                if (!map) return;
+
+                map.patchStyleState({ realisticSkyEnabled: true });
+
+                map.patchStyleState({ lightingMode: 'sun' });
+                map.setLighting({
+                    direction: [0, -1, 0.5],
+                    intensity: 0.2,
+                    color: '#f8f403'
+                });
+
+                map.setTrafficLayer({
+                    enabled: true,
+                    style: 'default',
+                });
+
+                map.patchStyleState({ immersiveRoadsOn: true });
+                
             });
 
             setMapglContext({
