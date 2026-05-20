@@ -120,14 +120,6 @@ export default function Mapgl() {
                 map?.patchStyleState({ lightingMode: 'sun' });
             };
 
-            const toggleTraffic = (enabled: boolean) => {
-                map?.setTrafficLayer({
-                    enabled: enabled,
-                    style: 'default',
-                });
-                console.log(`Пробки: ${enabled ? 'Включены' : 'Выключены'}`);
-            };
-
 
             map.once('styleload', () => {
                 map?.addLayer(layer);
@@ -135,7 +127,6 @@ export default function Mapgl() {
                 toggleImmersiveRoads(true);
                 toggleSkyAndFog(true);
                 setLighting();
-                toggleTraffic(true);
             });
 
             setMapglContext({
