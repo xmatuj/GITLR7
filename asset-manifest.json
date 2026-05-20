@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/GITLR7/static/css/main.7f4dc822.css",
+    "main.js": "/GITLR7/static/js/main.8f93783c.js",
+    "index.html": "/GITLR7/index.html",
+    "main.7f4dc822.css.map": "/GITLR7/static/css/main.7f4dc822.css.map",
+    "main.8f93783c.js.map": "/GITLR7/static/js/main.8f93783c.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.7f4dc822.css",
+    "static/js/main.8f93783c.js"
+  ]
+}
