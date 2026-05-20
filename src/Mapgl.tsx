@@ -24,7 +24,6 @@ export default function Mapgl() {
                 key: 'a3dde53f-81d3-4f90-ba73-12824734c793',
                 style: '83a6b2e5-e269-4607-ba06-255accc03f44',
                 styleState: { globeEnabled: true },
-                graphicsPreset: 'immersive',
             });
 
             const data: FeatureCollection<Geometry, GeoJsonProperties> = 
